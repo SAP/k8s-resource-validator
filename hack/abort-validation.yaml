@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  deploying: "true"
+kind: ConfigMap
+metadata:
+  name: landscape-state
+  namespace: default

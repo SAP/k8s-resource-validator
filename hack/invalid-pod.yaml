@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-sleep
+  namespace: k8s-resource-validator
+spec:
+  containers:
+  - name: busybox
+    image: busybox:1.28
+    args:
+    - sleep
+    - "1000000"
+    securityContext:
+      runAsUser: 1000
+      runAsNonRoot: true

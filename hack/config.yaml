@@ -1,0 +1,16 @@
+# abort all validations if the value of a specific field of a specific ConfigMap is set to "true"
+# this is useful in case the state of cluster resources is in transition (e.g. during deployment)
+abort:
+  configMapNamespace: "default"
+  configMapName: "resource-validation-abort"
+  configMapField: "deploying"
+
+# skip allowed and freshness validations for Pods that have a specific label
+# for example, a controller might label certain Pods to indicate that they are managed by that controller
+exempt:
+  labelName: "helmcharts.helm.cattle.io/chart"
+  labelValue: "traefik"
+
+# resource age, above which, it is defined as stale
+freshness:
+  thresholdInHours: 672

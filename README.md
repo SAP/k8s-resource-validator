@@ -8,7 +8,9 @@ A Go library that retrieves resources from a Kubernetes cluster and verifies the
 
 ## Requirements and Setup
 
-*Insert a short description what is required to get your project running...*
+This repo is a [Go](https://go.dev/doc/install) library that is meant to be imported by other Go applications.
+
+For detailed information about setup and usage see [here](docs/DETAILS.md).
 
 ## Support, Feedback, Contributing
 
