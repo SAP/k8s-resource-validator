@@ -25,4 +25,4 @@ jobs:
       run: go build -v ./cmd/sample.go
 
     - name: Test
-      run: go test -v ./pkg/
+      run: go test -v ./pkg/...
