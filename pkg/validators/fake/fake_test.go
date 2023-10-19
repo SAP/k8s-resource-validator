@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/afero"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/common"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/test_utils"
+	"github.com/SAP/k8s-resource-validator/pkg/common"
+	"github.com/SAP/k8s-resource-validator/pkg/test_utils"
 )
 
 const (

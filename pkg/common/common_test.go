@@ -9,7 +9,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
-	// "github.tools.sap/I034929/k8s-resource-validator/pkg/validators/fake"
+
+	// "github.com/SAP/k8s-resource-validator/pkg/validators/fake"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )

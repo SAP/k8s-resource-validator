@@ -21,12 +21,12 @@ import (
 	"github.com/knadh/koanf/v2"
 	"github.com/spf13/afero"
 
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/common"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/validation"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/validators/allowed_pods"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/validators/freshness"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/validators/privileged_pods"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/validators/readiness"
+	"github.com/SAP/k8s-resource-validator/pkg/common"
+	"github.com/SAP/k8s-resource-validator/pkg/validation"
+	"github.com/SAP/k8s-resource-validator/pkg/validators/allowed_pods"
+	"github.com/SAP/k8s-resource-validator/pkg/validators/freshness"
+	"github.com/SAP/k8s-resource-validator/pkg/validators/privileged_pods"
+	"github.com/SAP/k8s-resource-validator/pkg/validators/readiness"
 )
 
 func main() {
