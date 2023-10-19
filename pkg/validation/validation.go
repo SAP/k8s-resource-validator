@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/common"
+	"github.com/SAP/k8s-resource-validator/pkg/common"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 

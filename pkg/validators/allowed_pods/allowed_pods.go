@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/SAP/k8s-resource-validator/pkg/common"
 	"github.com/go-logr/logr"
 	"github.com/spf13/afero"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/common"
 	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )

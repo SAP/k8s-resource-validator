@@ -1,4 +1,4 @@
-module github.tools.sap/I034929/k8s-resource-validator
+module github.com/SAP/k8s-resource-validator
 
 go 1.20
 

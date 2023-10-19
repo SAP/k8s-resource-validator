@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/SAP/k8s-resource-validator/pkg/common"
 	"github.com/go-logr/logr"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/common"
 )
 
 const LOGGER_NAME string = "k8s-k8s-resource-validator"

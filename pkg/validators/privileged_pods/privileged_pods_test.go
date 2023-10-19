@@ -6,13 +6,13 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/SAP/k8s-resource-validator/pkg/common"
+	"github.com/SAP/k8s-resource-validator/pkg/test_utils"
 	"github.com/go-logr/logr"
 	"github.com/go-logr/logr/testr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/afero"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/common"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/test_utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )

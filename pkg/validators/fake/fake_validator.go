@@ -7,7 +7,7 @@ import (
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/common"
+	"github.com/SAP/k8s-resource-validator/pkg/common"
 )
 
 func NewFakeValidator(ctx context.Context, numberOfViolations int) common.Validator {

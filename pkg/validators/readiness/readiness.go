@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/common"
+	"github.com/SAP/k8s-resource-validator/pkg/common"
 )
 
 const readinesslistFile = "readinesslist.yaml"

@@ -9,7 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/common"
+	"github.com/SAP/k8s-resource-validator/pkg/common"
 )
 
 func NewFreshnessValidator(ctx context.Context, freshnessThresholdInHours int32) common.Validator {

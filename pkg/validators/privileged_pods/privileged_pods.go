@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/SAP/k8s-resource-validator/pkg/common"
 	"github.com/go-logr/logr"
-	"github.tools.sap/I034929/k8s-resource-validator/pkg/common"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
