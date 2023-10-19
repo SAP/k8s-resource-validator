@@ -13,7 +13,7 @@ The `k8s-resource-validator` can run either [in-cluster](#running-in-kubernetes)
 ## Motivation
 Although alternative tools exist that validate Kubernetes resources, we had a specific need that those tools couldn't satisfy: we needed to recursively search through resource [owner reference](https://kubernetes.io/docs/concepts/overview/working-with-objects/owners-dependents/#owner-references-in-object-specifications) trees, in order to validate our Kubernetes resources.
 
-The alternatives we evaluated allow defining custom policies declaratively. However, the declarative approach proved restrictive for our purposes, so we opted for a pluggable programmable approach.
+The alternatives we evaluated allow defining custom policies declaratively. However, the declarative approach proved restrictive for our purposes, so we opted for a pluggable imperative approach.
 
 ## Built-In Validators
 This repo contains implementations for several built-in validators:

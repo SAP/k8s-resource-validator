@@ -5,6 +5,8 @@
 ## Description
 A Go library that retrieves resources from a Kubernetes cluster and verifies their validity. Invalid resources are logged as such.
 
+**Note:** If a malicious actor gains write access to your cluster's API, they could change the `k8s-resource-validator`'s settings, or even prevent the validator from running. [Keep your cluster secure](https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/)!
+
 ## Requirements
 This repo is a [Go](https://go.dev/doc/install) library that is meant to be imported by other Go applications.
 
