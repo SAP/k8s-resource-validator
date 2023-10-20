@@ -2,13 +2,13 @@
 Detailed Documentation
 
 ## Overview
-The `k8s-resource-validator` checks whether Kubernetes resources are valid. The definition of "valid" resources depends on which `validator` implementations are loaded.
+The Kubernetes Resource Validator checks whether Kubernetes resources are valid. The definition of "valid" resources depends on which `validator` implementations are loaded.
 
 This library includes a number of [built-in validators](#built-in-validators). In addition, consumers of this library can provide their own [custom validators](#custom-validators).
 
 Invalid resources are flagged as `violation`s, that are written to a [log](#logging). Consumers of this library can inject any of a number of standard logging implementations.
 
-The `k8s-resource-validator` can run either [in-cluster](#running-in-kubernetes) or [out-of-cluster](#running-out-of-cluster), such as from a CI environment.
+The Kubernetes Resource Validator can run either [in-cluster](#running-in-kubernetes) or [out-of-cluster](#running-out-of-cluster), such as from a CI environment.
 
 ## Motivation
 Although alternative tools exist that validate Kubernetes resources, we had a specific need that those tools couldn't satisfy: we needed to recursively search through resource [owner reference](https://kubernetes.io/docs/concepts/overview/working-with-objects/owners-dependents/#owner-references-in-object-specifications) trees, in order to validate our Kubernetes resources.
@@ -59,9 +59,9 @@ Note that the validator you run must support this feature for the resource to ac
 ## Aborting Validations
 Occasionally, the target Kubernetes cluster might yield inconsistent validation results. For example, running pods might not the allowlist during deployment of resources to the cluster.
 
-In this case, you can abort the validation by setting a `ConfigMap` to contain a value, indicating to the k8s-resource-validator to abort the validation.
+In this case, you can abort the validation by setting a `ConfigMap` to contain a value, indicating to the Kubernetes Resource Validator to abort the validation.
 
-This `ConfigMap` can be specified in the k8s-resource-validator's configuration:
+This `ConfigMap` can be specified in the Kubernetes Resource Validator's configuration:
 ```yaml
 abort:
   configMapNamespace: "default"
@@ -72,7 +72,7 @@ abort:
 Set the value of the `configMapField` to `"true"` to abort the validation. In all other cases (e.g. the `ConfigMap` is not found) the validation will execute normally.
 
 ## Logging
-`k8s-resource-validator` uses the [`logr`](https://github.com/go-logr/logr) library as an interface to logging violations as well as other errors.
+Kubernetes Resource Validator uses the [`logr`](https://github.com/go-logr/logr) library as an interface to logging violations as well as other errors.
 
 The actual logging implementation is set by users of this library. See the `logr` documentation for a partial [list of supported logging implementations](https://github.com/go-logr/logr#implementations-non-exhaustive).
 
@@ -86,7 +86,7 @@ The configuration directory may contain the following files:
 * `readinesslist.yaml` - used by the built-in readiness validator.
 
 ## Resource Kinds
-The `k8s-resource-validator` validates these built-in Kubernetes [workload](https://kubernetes.io/docs/concepts/workloads/) resources:
+The Kubernetes Resource Validator validates these built-in Kubernetes [workload](https://kubernetes.io/docs/concepts/workloads/) resources:
 * `Pod`
 * `Deployment`
 * `ReplicaSet`
@@ -96,9 +96,9 @@ The `k8s-resource-validator` validates these built-in Kubernetes [workload](http
 * `Job`
 * `CronJob`
 
-In order to support additional resources, you can specify which resources the `k8s-resource-validator` should handle: Place an `additionalResourceTypes.yaml` file in the default configuration directory.
+In order to support additional resources, you can specify which resources the Kubernetes Resource Validator should handle: Place an `additionalResourceTypes.yaml` file in the default configuration directory.
 
-If you are running in-cluster, you should separately grant the pod running the `k8s-resource-validator` permissions to read/list these additional resource types (see [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)).
+If you are running in-cluster, you should separately grant the pod running the Kubernetes Resource Validator permissions to read/list these additional resource types (see [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)).
 
 ## Running the Application
 This repo is a `go` library that is meant to be imported by other `go` applications.
@@ -124,12 +124,12 @@ If you would like to run your resource validator from within a Kubernetes cluste
 * Deploy the above Kubernetes resources to a cluster (you can deploy them directly, or use [`Helm`](https://helm.sh/), [`Kustomize`](https://kustomize.io/) or similar tools to help you with this).
 
 ### Running Out-of-Cluster
-By default, the `k8s-resource-validator` assumes it is running inside a Kubernetes cluster.
+By default, the Kubernetes Resource Validator assumes it is running inside a Kubernetes cluster.
 
-However, if you wish to run the `k8s-resource-validator` from a CI environment, for development purposes, or for any other reason from outside the cluster, follow these steps:
+However, if you wish to run the Kubernetes Resource Validator from a CI environment, for development purposes, or for any other reason from outside the cluster, follow these steps:
 * Set the value of the `KUBECONFIG` environment variable to point to the location of your cluster's `kubeconfig` file.
   
-  If the above fails, the k8s-resource-validator will attempt to connect to a cluster based on the `config` file in your homedir's `.kube` directory.
+  If the above fails, the Kubernetes Resource Validator will attempt to connect to a cluster based on the `config` file in your homedir's `.kube` directory.
 * Set the value of the `CONFIG_DIR` environment variable to point to the location where your configuration files reside (`config.yaml`, `allowlist.yaml`, `readinesslist.yaml`, etc.)
 
 Place the `allowlist.yaml` and `readinesslist.yaml` files in some directory (e.g. `/home/config`) and run the validator application with environment variable `CONFIG_DIR` set to that directory:
