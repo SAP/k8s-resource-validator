@@ -77,7 +77,7 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		validation.SetClient(client)
 		Expect(err).To(Succeed())
 
-		violations := validation.Validate(nil)
+		violations, _ := validation.Validate(nil)
 
 		Expect(len(violations)).To(Equal(0))
 	})
@@ -94,7 +94,7 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		Expect(err).To(Succeed())
 
 		fakeValidator := fake.NewFakeValidator(ctx, numberOfViolations)
-		violations := validation.Validate([]common.Validator{fakeValidator})
+		violations, _ := validation.Validate([]common.Validator{fakeValidator})
 
 		Expect(len(violations)).To(Equal(numberOfViolations))
 	})
@@ -114,7 +114,7 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		violations := []common.Violation{errorViolation, infoViolation}
 
 		logLengthBefore := len(logBuffer.String())
-		Log(ctx, violations, 0)
+		LogViolations(ctx, violations, 0)
 		out := logBuffer.String()[logLengthBefore:]
 
 		Expect(out).To(ContainSubstring("info violations"))
@@ -129,7 +129,7 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		violations := []common.Violation{}
 
 		logLengthBefore := len(logBuffer.String())
-		Log(ctx, violations, 1)
+		LogViolations(ctx, violations, 1)
 		out := logBuffer.String()[logLengthBefore:]
 		Expect(out).To(ContainSubstring("valid"))
 	})

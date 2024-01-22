@@ -13,7 +13,10 @@ import (
 	"github.com/SAP/k8s-resource-validator/pkg/common"
 )
 
-const readinesslistFile = "readinesslist.yaml"
+const (
+	ValidatorName     = "built-in:readiness"
+	readinesslistFile = "readinesslist.yaml"
+)
 
 type ReadinesslistItem struct {
 	Name      string `yaml:"name"`
@@ -36,6 +39,10 @@ type ReadinessValidator struct {
 	ignoreMissingResources bool
 }
 
+func (v *ReadinessValidator) GetName() string {
+	return ValidatorName
+}
+
 // validates all the resources from readinesslist are ready
 func (v *ReadinessValidator) Validate(ctx context.Context, resources []unstructured.Unstructured) (violations []common.Violation, err error) {
 	var readinesslist []ReadinesslistItem
@@ -50,7 +57,7 @@ func (v *ReadinessValidator) Validate(ctx context.Context, resources []unstructu
 			if v.ignoreMissingResources {
 				v.logger.V(2).Info("could not find readinesslist item, but set to ignore")
 			} else {
-				violation := common.NewViolation(*resource, "readiness violation", 1, v.GetName())
+				violation := common.NewViolation(*resource, "readiness violation", 1, ValidatorName)
 				violations = append(violations, violation)
 			}
 			continue
@@ -61,7 +68,7 @@ func (v *ReadinessValidator) Validate(ctx context.Context, resources []unstructu
 		if err != nil {
 			msg := fmt.Sprintf("could not determine readiness of resource Kind: %s Name: %s Namespace: %s",
 				resource.GetKind(), resource.GetName(), resource.GetNamespace())
-			v.logger.V(0).Info(msg, "error", err)
+			v.logger.Error(err, msg)
 			continue
 		}
 
@@ -69,16 +76,12 @@ func (v *ReadinessValidator) Validate(ctx context.Context, resources []unstructu
 			v.logger.V(2).Info(fmt.Sprintf("resource Kind: %s Name: %s Namespace: %s is ready",
 				resource.GetKind(), resource.GetName(), resource.GetNamespace()))
 		} else {
-			violation := common.NewViolation(*resource, "readiness violation", 1, v.GetName())
+			violation := common.NewViolation(*resource, "readiness violation", 1, ValidatorName)
 			violations = append(violations, violation)
 		}
 	}
 
 	return
-}
-
-func (v *ReadinessValidator) GetName() string {
-	return "built-in:readiness"
 }
 
 func (v *ReadinessValidator) readReadinesslist(dir string) ([]ReadinesslistItem, error) {
@@ -87,12 +90,12 @@ func (v *ReadinessValidator) readReadinesslist(dir string) ([]ReadinesslistItem,
 
 	content, err := afero.ReadFile(v.appFs, readinesslistFileFullPath)
 	if err != nil {
-		v.logger.V(2).Info("couldn't find readinesslist file", "readiness file", readinesslistFileFullPath)
+		v.logger.Error(err, "couldn't find readinesslist file", readinesslistFileFullPath)
 		return nil, err
 	} else {
 		err := yaml.Unmarshal(content, &readinesslist)
 		if err != nil {
-			v.logger.V(2).Error(err, "couldn't parse readinesslist file")
+			v.logger.Error(err, "couldn't parse readinesslist file")
 			return nil, err
 		}
 	}

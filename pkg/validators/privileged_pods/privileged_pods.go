@@ -20,6 +20,7 @@ var (
 )
 
 const (
+	ValidatorName         = "built-in:privileged-pods"
 	capabilityCapSysAdmin = "CAP_SYS_ADMIN"
 	privilegedReasonTpl   = "securityContext %s value is %s\n"
 )
@@ -34,6 +35,10 @@ type PrivilegedPodsValidator struct {
 	preApprovedPods []unstructured.Unstructured
 	ctx             context.Context
 	logger          logr.Logger
+}
+
+func (v *PrivilegedPodsValidator) GetName() string {
+	return ValidatorName
 }
 
 /*
@@ -69,10 +74,6 @@ func (v *PrivilegedPodsValidator) Validate(ctx context.Context, resources []unst
 	return violations, nil
 }
 
-func (v *PrivilegedPodsValidator) GetName() string {
-	return "built-in:privileged-pods"
-}
-
 func (v *PrivilegedPodsValidator) SetPreApprovedPods(pods []unstructured.Unstructured) {
 	v.preApprovedPods = pods
 }
@@ -84,7 +85,7 @@ func (v *PrivilegedPodsValidator) handlePrivilegedPod(p unstructured.Unstructure
 	}
 
 	if privilegedPodMsg != "" {
-		violation := common.NewViolation(p, "found privileged pod", 1, v.GetName())
+		violation := common.NewViolation(p, "found privileged pod", 1, ValidatorName)
 		violations = append(violations, violation)
 	}
 	return violations, nil

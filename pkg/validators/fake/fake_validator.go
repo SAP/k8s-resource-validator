@@ -10,6 +10,8 @@ import (
 	"github.com/SAP/k8s-resource-validator/pkg/common"
 )
 
+const ValidatorName = "built-in:fake"
+
 func NewFakeValidator(ctx context.Context, numberOfViolations int) common.Validator {
 	response := FakeValidator{ctx: ctx, numberOfViolations: numberOfViolations}
 	response.logger, _ = logr.FromContext(ctx)
@@ -22,6 +24,10 @@ type FakeValidator struct {
 	numberOfViolations int
 }
 
+func (v *FakeValidator) GetName() string {
+	return ValidatorName
+}
+
 /*
 *
  */
@@ -31,13 +37,9 @@ func (v *FakeValidator) Validate(ctx context.Context, resources []unstructured.U
 		resource.SetName(fmt.Sprintf("%d", i))
 		resource.SetNamespace("fake")
 		resource.SetKind("Fake")
-		violation := common.NewViolation(resource, "Fake resource violation", 1, v.GetName())
+		violation := common.NewViolation(resource, "Fake resource violation", 1, ValidatorName)
 		violations = append(violations, violation)
 	}
 
 	return
-}
-
-func (v *FakeValidator) GetName() string {
-	return "built-in:fake"
 }

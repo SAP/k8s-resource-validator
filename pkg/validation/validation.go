@@ -74,7 +74,7 @@ func (v *Validation) preValidate() (aborted bool) {
 			var err error
 			v.Client, err = getClient()
 			if err != nil {
-				v.logger.V(0).Info("unable to create client", "error", err)
+				v.logger.Error(err, "unable to create client", "error", err)
 				panic(err)
 			}
 		}
@@ -104,25 +104,29 @@ func (v *Validation) preValidate() (aborted bool) {
 /*
 returns a slice of violations (empty if no violations are found)
 */
-func (v *Validation) Validate(validators []common.Validator) []common.Violation {
+func (v *Validation) Validate(validators []common.Validator) ([]common.Violation, []error) {
 	aborted := v.preValidate()
 
+	var errs []error
 	var violations []common.Violation
+
 	if aborted {
-		return violations
+		return violations, errs
 	}
 
 	for _, validator := range validators {
 		newViolations, err := validator.Validate(v.ctx, v.Resources)
-		if err == nil && len(newViolations) != 0 {
-			violations = append(violations, newViolations...)
-		}
 		if err != nil {
-			v.logger.V(1).Info("", "error", err)
+			errs = append(errs, err)
+			v.logger.Error(err, validator.GetName())
+		}
+
+		if len(newViolations) > 0 {
+			violations = append(violations, newViolations...)
 		}
 	}
 
-	return violations
+	return violations, errs
 }
 
 func (v *Validation) readAdditionalResourceTypes(dir string) []schema.GroupVersionResource {
@@ -132,12 +136,12 @@ func (v *Validation) readAdditionalResourceTypes(dir string) []schema.GroupVersi
 
 	content, err := afero.ReadFile(v.appFs, additionalResourceTypesFullPath)
 	if err != nil {
-		v.logger.V(2).Info("couldn't find additional resource types file", "file", additionalResourceTypesFullPath)
+		v.logger.V(0).Info("couldn't find additional resource types file", additionalResourceTypesFullPath)
 		return nil
 	} else {
 		err := yaml.Unmarshal(content, &additionalResourceTypes)
 		if err != nil {
-			v.logger.V(0).Info("couldn't parse additional resource types file:", "error", err)
+			v.logger.Error(err, "couldn't parse additional resource types file")
 			return nil
 		}
 	}

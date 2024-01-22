@@ -14,6 +14,7 @@ import (
 
 const (
 	allowlistFile = "allowlist.yaml"
+	ValidatorName = "built-in:allowed-pods"
 )
 
 type AllowlistItem struct {
@@ -41,6 +42,10 @@ type AllowedPodsValidator struct {
 	logger      logr.Logger
 }
 
+func (v *AllowedPodsValidator) GetName() string {
+	return ValidatorName
+}
+
 func (v *AllowedPodsValidator) Validate(ctx context.Context, resources []unstructured.Unstructured) ([]common.Violation, error) {
 	pods := common.GetPods(resources)
 	rawAllowlist, err := v.readAllowlist(v.configDir)
@@ -63,14 +68,10 @@ func (v *AllowedPodsValidator) Validate(ctx context.Context, resources []unstruc
 			v.allowedPods = append(v.allowedPods, pod)
 			continue
 		}
-		violation := common.NewViolation(pod, "NOT found in allowlist", 1, v.GetName())
+		violation := common.NewViolation(pod, "NOT found in allowlist", 1, ValidatorName)
 		violations = append(violations, violation)
 	}
 	return violations, nil
-}
-
-func (v *AllowedPodsValidator) GetName() string {
-	return "built-in:allowed-pods"
 }
 
 func (v *AllowedPodsValidator) readAllowlist(dir string) ([]AllowlistItem, error) {
@@ -79,12 +80,12 @@ func (v *AllowedPodsValidator) readAllowlist(dir string) ([]AllowlistItem, error
 
 	content, err := afero.ReadFile(v.appFs, allowlistFileFullPath)
 	if err != nil {
-		v.logger.V(2).Info("couldn't read allowlist file", "allowlist file", allowlistFileFullPath, "error", err)
+		v.logger.Error(err, "couldn't read allowlist file", allowlistFileFullPath)
 		return nil, err
 	} else {
 		err := yaml.Unmarshal(content, &allowlist)
 		if err != nil {
-			v.logger.V(0).Info("couldn't parse allowlist file", "error", err)
+			v.logger.Error(err, "couldn't parse allowlist file")
 			return nil, err
 		}
 	}

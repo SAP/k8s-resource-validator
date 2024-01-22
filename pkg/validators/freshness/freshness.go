@@ -12,6 +12,8 @@ import (
 	"github.com/SAP/k8s-resource-validator/pkg/common"
 )
 
+const ValidatorName = "built-in:freshness"
+
 func NewFreshnessValidator(ctx context.Context, freshnessThresholdInHours int32) common.Validator {
 	response := FreshnessValidator{freshnessThresholdInHours: freshnessThresholdInHours, ctx: ctx}
 	response.logger, _ = logr.FromContext(ctx)
@@ -22,6 +24,10 @@ type FreshnessValidator struct {
 	freshnessThresholdInHours int32
 	ctx                       context.Context
 	logger                    logr.Logger
+}
+
+func (v *FreshnessValidator) GetName() string {
+	return ValidatorName
 }
 
 /*
@@ -36,19 +42,15 @@ func (v *FreshnessValidator) Validate(ctx context.Context, resources []unstructu
 		} else {
 			podIsStale := isPodStale(p, v.freshnessThresholdInHours)
 			if podIsStale {
-				violation := common.NewViolation(p, "Pod is stale", 1, v.GetName())
+				violation := common.NewViolation(p, "Pod is stale", 1, ValidatorName)
 				violations = append(violations, violation)
 			} else {
-				v.logger.V(2).Info(fmt.Sprintf("pod is fresh: %s/%s", p.GetNamespace(), p.GetName()))
+				v.logger.V(3).Info(fmt.Sprintf("pod is fresh: %s/%s", p.GetNamespace(), p.GetName()))
 			}
 		}
 	}
 
 	return
-}
-
-func (v *FreshnessValidator) GetName() string {
-	return "built-in:freshness"
 }
 
 func isPodStale(pod unstructured.Unstructured, freshnessThresholdInHours int32) bool {
