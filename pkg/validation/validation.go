@@ -2,6 +2,7 @@ package validation
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -68,14 +69,14 @@ func (v *Validation) SetAbortFunc(abortFunc common.AbortFunc) {
 	v.abortFunc = abortFunc
 }
 
-func (v *Validation) preValidate() (aborted bool) {
+func (v *Validation) preValidate() (aborted bool, err error) {
 	if !v.preValidated {
 		if v.Client == nil {
 			var err error
 			v.Client, err = getClient()
 			if err != nil {
-				v.logger.Error(err, "unable to create client", "error", err)
-				panic(err)
+				v.logger.Error(err, "unable to create client")
+				return false, err
 			}
 		}
 
@@ -89,7 +90,7 @@ func (v *Validation) preValidate() (aborted bool) {
 			shouldAbort, abortMessage := v.shouldAbortValidation(v.ctx, *v.Client)
 			v.logger.V(2).Info(abortMessage)
 			if shouldAbort {
-				return true
+				return true, nil
 			}
 		} else {
 			return v.abortFunc()
@@ -98,26 +99,30 @@ func (v *Validation) preValidate() (aborted bool) {
 		v.preValidated = true
 	}
 
-	return false
+	return false, nil
 }
 
 /*
 returns a slice of violations (empty if no violations are found)
 */
-func (v *Validation) Validate(validators []common.Validator) ([]common.Violation, []error) {
-	aborted := v.preValidate()
-
-	var errs []error
+func (v *Validation) Validate(validators []common.Validator) ([]common.Violation, error) {
+	var cumulativeErr error
 	var violations []common.Violation
 
+	aborted, err := v.preValidate()
+	if err != nil {
+		cumulativeErr = errors.Join(cumulativeErr, err)
+		return violations, cumulativeErr
+	}
+
 	if aborted {
-		return violations, errs
+		return violations, cumulativeErr
 	}
 
 	for _, validator := range validators {
-		newViolations, err := validator.Validate(v.ctx, v.Resources)
+		newViolations, err := validator.Validate(v.Resources)
 		if err != nil {
-			errs = append(errs, err)
+			cumulativeErr = errors.Join(cumulativeErr, err)
 			v.logger.Error(err, validator.GetName())
 		}
 
@@ -126,7 +131,7 @@ func (v *Validation) Validate(validators []common.Validator) ([]common.Violation
 		}
 	}
 
-	return violations, errs
+	return violations, cumulativeErr
 }
 
 func (v *Validation) readAdditionalResourceTypes(dir string) []schema.GroupVersionResource {

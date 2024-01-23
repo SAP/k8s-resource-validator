@@ -47,7 +47,7 @@ func (v *PrivilegedPodsValidator) GetName() string {
 	the return violations array is non-nil if invalid resources were found
 	the return error is non-nil if another type of error was encountered
 */
-func (v *PrivilegedPodsValidator) Validate(ctx context.Context, resources []unstructured.Unstructured) ([]common.Violation, error) {
+func (v *PrivilegedPodsValidator) Validate(resources []unstructured.Unstructured) ([]common.Violation, error) {
 	pods := common.GetPods(resources)
 	var violations []common.Violation
 	for _, pod := range pods {

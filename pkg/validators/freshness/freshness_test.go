@@ -55,7 +55,7 @@ var _ = Describe("Freshness", func() {
 			thirtyMinutesAgo := metav1.Now().Add(time.Minute * -30)
 			freshnessUnstructuredResource.SetCreationTimestamp(metav1.NewTime(thirtyMinutesAgo))
 
-			violationsArray, err := freshnessValidator.Validate(ctx, []unstructured.Unstructured{freshnessUnstructuredResource})
+			violationsArray, err := freshnessValidator.Validate([]unstructured.Unstructured{freshnessUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(0))
 		})
@@ -63,7 +63,7 @@ var _ = Describe("Freshness", func() {
 		It("pod is fresh (no creationTimestamp)", func() {
 			freshnessValidator := NewFreshnessValidator(ctx, 1) // any resource created less than 1 hour ago is fresh
 
-			violationsArray, err := freshnessValidator.Validate(ctx, []unstructured.Unstructured{freshnessUnstructuredResource})
+			violationsArray, err := freshnessValidator.Validate([]unstructured.Unstructured{freshnessUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(0))
 		})
@@ -73,7 +73,7 @@ var _ = Describe("Freshness", func() {
 			thirtyMinutesAgo := metav1.Now().Add(time.Minute * -90)
 			freshnessUnstructuredResource.SetCreationTimestamp(metav1.NewTime(thirtyMinutesAgo))
 
-			violationsArray, err := freshnessValidator.Validate(ctx, []unstructured.Unstructured{freshnessUnstructuredResource})
+			violationsArray, err := freshnessValidator.Validate([]unstructured.Unstructured{freshnessUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(1))
 		})
@@ -90,7 +90,7 @@ var _ = Describe("Freshness", func() {
 			freshnessUnstructuredResource.SetName("stale-but-exempt")
 			freshnessUnstructuredResource.SetLabels(labels)
 
-			violationsArray, err := freshnessValidator.Validate(ctx, []unstructured.Unstructured{freshnessUnstructuredResource})
+			violationsArray, err := freshnessValidator.Validate([]unstructured.Unstructured{freshnessUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(0))
 		})

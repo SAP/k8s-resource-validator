@@ -46,7 +46,7 @@ func (v *AllowedPodsValidator) GetName() string {
 	return ValidatorName
 }
 
-func (v *AllowedPodsValidator) Validate(ctx context.Context, resources []unstructured.Unstructured) ([]common.Violation, error) {
+func (v *AllowedPodsValidator) Validate(resources []unstructured.Unstructured) ([]common.Violation, error) {
 	pods := common.GetPods(resources)
 	rawAllowlist, err := v.readAllowlist(v.configDir)
 	if err != nil {

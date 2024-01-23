@@ -193,7 +193,7 @@ var _ = Describe("Privileged Pods", func() {
 		It("returns nil and Errors in Violations array when encountered privileged pod", func() {
 			privilegedPodsValidator := NewPrivilegedPodsValidator(ctx)
 			privilegedPodUnstructuredResource.SetName("foreign-privileged-pod")
-			violationsArray, err := privilegedPodsValidator.Validate(ctx, []unstructured.Unstructured{privilegedPodUnstructuredResource})
+			violationsArray, err := privilegedPodsValidator.Validate([]unstructured.Unstructured{privilegedPodUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(1))
 			Expect(violationsArray[0].Message).To(ContainSubstring("found privileged pod"))
@@ -204,7 +204,7 @@ var _ = Describe("Privileged Pods", func() {
 			privilegedPodsValidator := NewPrivilegedPodsValidator(ctx)
 			privilegedPodUnstructuredResource.SetName("foreign-privileged-pod")
 			privilegedPodsValidator.(*PrivilegedPodsValidator).SetPreApprovedPods([]unstructured.Unstructured{privilegedPodUnstructuredResource})
-			violationsArray, err := privilegedPodsValidator.Validate(ctx, []unstructured.Unstructured{privilegedPodUnstructuredResource})
+			violationsArray, err := privilegedPodsValidator.Validate([]unstructured.Unstructured{privilegedPodUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(0))
 		})

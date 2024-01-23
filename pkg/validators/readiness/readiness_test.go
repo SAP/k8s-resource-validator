@@ -71,7 +71,7 @@ var _ = Describe("Readiness", func() {
 			readyConditions := []interface{}{readyCondition}
 			unstructured.SetNestedField(readinessUnstructuredResource.Object, readyConditions, "status", "conditions")
 
-			violationsArray, err := readinessValidator.Validate(ctx, []unstructured.Unstructured{readinessUnstructuredResource})
+			violationsArray, err := readinessValidator.Validate([]unstructured.Unstructured{readinessUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(0))
 		})
@@ -81,7 +81,7 @@ var _ = Describe("Readiness", func() {
 
 			unstructured.SetNestedField(readinessUnstructuredResource.Object, true, "status", "ready")
 
-			violationsArray, err := readinessValidator.Validate(ctx, []unstructured.Unstructured{readinessUnstructuredResource})
+			violationsArray, err := readinessValidator.Validate([]unstructured.Unstructured{readinessUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(0))
 		})
@@ -95,7 +95,7 @@ var _ = Describe("Readiness", func() {
 			readyConditions := []interface{}{readyCondition}
 			unstructured.SetNestedField(readinessUnstructuredResource.Object, readyConditions, "status", "conditions")
 
-			violationsArray, err := readinessValidator.Validate(ctx, []unstructured.Unstructured{readinessUnstructuredResource})
+			violationsArray, err := readinessValidator.Validate([]unstructured.Unstructured{readinessUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(1))
 		})
@@ -103,7 +103,7 @@ var _ = Describe("Readiness", func() {
 		It("pod is not ready (missing status)", func() {
 			freshnessValidator := NewReadinessValidator(ctx, configDirectory, false)
 
-			violationsArray, err := freshnessValidator.Validate(ctx, []unstructured.Unstructured{readinessUnstructuredResource})
+			violationsArray, err := freshnessValidator.Validate([]unstructured.Unstructured{readinessUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(1))
 		})
@@ -111,7 +111,7 @@ var _ = Describe("Readiness", func() {
 		It("could not read readiness file", func() {
 			freshnessValidator := NewReadinessValidator(ctx, "/doesnotexist/", false)
 
-			violationsArray, err := freshnessValidator.Validate(ctx, []unstructured.Unstructured{readinessUnstructuredResource})
+			violationsArray, err := freshnessValidator.Validate([]unstructured.Unstructured{readinessUnstructuredResource})
 			Expect(err).To(HaveOccurred())
 			Expect(violationsArray).To(HaveLen(0))
 		})
@@ -122,7 +122,7 @@ var _ = Describe("Readiness", func() {
 			readinessListItemsAsString := "-- "
 			_ = afero.WriteFile(appFs, filepath.Join(configDirectory, readinesslistFile), []byte(readinessListItemsAsString), 0644)
 
-			violationsArray, err := freshnessValidator.Validate(ctx, []unstructured.Unstructured{readinessUnstructuredResource})
+			violationsArray, err := freshnessValidator.Validate([]unstructured.Unstructured{readinessUnstructuredResource})
 			Expect(err).To(HaveOccurred())
 			Expect(violationsArray).To(HaveLen(0))
 		})
@@ -135,7 +135,7 @@ var _ = Describe("Readiness", func() {
 			)
 			_ = afero.WriteFile(appFs, filepath.Join(configDirectory, readinesslistFile), []byte(readinessListItemsAsString), 0644)
 
-			violationsArray, err := readinessValidator.Validate(ctx, []unstructured.Unstructured{readinessUnstructuredResource})
+			violationsArray, err := readinessValidator.Validate([]unstructured.Unstructured{readinessUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(1))
 		})
@@ -148,7 +148,7 @@ var _ = Describe("Readiness", func() {
 			)
 			_ = afero.WriteFile(appFs, filepath.Join(configDirectory, readinesslistFile), []byte(readinessListItemsAsString), 0644)
 
-			violationsArray, err := readinessValidator.Validate(ctx, []unstructured.Unstructured{readinessUnstructuredResource})
+			violationsArray, err := readinessValidator.Validate([]unstructured.Unstructured{readinessUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(0))
 		})

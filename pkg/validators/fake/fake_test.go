@@ -59,7 +59,7 @@ var _ = Describe("Fake Validator", func() {
 		It("violations", func() {
 			violationsCount := 2
 			allowedPodsValidator := NewFakeValidator(ctx, violationsCount)
-			violationsArray, err := allowedPodsValidator.Validate(ctx, []unstructured.Unstructured{podUnstructuredResource})
+			violationsArray, err := allowedPodsValidator.Validate([]unstructured.Unstructured{podUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(violationsCount))
 

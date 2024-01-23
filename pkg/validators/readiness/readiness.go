@@ -44,7 +44,7 @@ func (v *ReadinessValidator) GetName() string {
 }
 
 // validates all the resources from readinesslist are ready
-func (v *ReadinessValidator) Validate(ctx context.Context, resources []unstructured.Unstructured) (violations []common.Violation, err error) {
+func (v *ReadinessValidator) Validate(resources []unstructured.Unstructured) (violations []common.Violation, err error) {
 	var readinesslist []ReadinesslistItem
 	readinesslist, err = v.readReadinesslist(v.configDir)
 	if err != nil {

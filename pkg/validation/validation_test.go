@@ -77,7 +77,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		validation.SetClient(client)
 		Expect(err).To(Succeed())
 
-		violations, _ := validation.Validate(nil)
+		violations, err := validation.Validate(nil)
+		Expect(err).To(Succeed())
 
 		Expect(len(violations)).To(Equal(0))
 	})
@@ -158,7 +159,7 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		validation.AbortValidationConfigMapNamespace = abortConfigMapNamespace
 		Expect(err).To(Succeed())
 
-		aborted := validation.preValidate()
+		aborted, _ := validation.preValidate()
 
 		Expect(aborted).To(BeTrue())
 	})
@@ -187,7 +188,7 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		validation.AbortValidationConfigMapNamespace = abortConfigMapNamespace
 		Expect(err).To(Succeed())
 
-		aborted := validation.preValidate()
+		aborted, _ := validation.preValidate()
 
 		Expect(aborted).To(BeFalse())
 	})
@@ -216,7 +217,7 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		validation.AbortValidationConfigMapNamespace = abortConfigMapNamespace
 		Expect(err).To(Succeed())
 
-		aborted := validation.preValidate()
+		aborted, _ := validation.preValidate()
 
 		Expect(aborted).To(BeFalse())
 	})

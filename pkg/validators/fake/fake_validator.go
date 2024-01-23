@@ -31,7 +31,7 @@ func (v *FakeValidator) GetName() string {
 /*
 *
  */
-func (v *FakeValidator) Validate(ctx context.Context, resources []unstructured.Unstructured) (violations []common.Violation, err error) {
+func (v *FakeValidator) Validate(resources []unstructured.Unstructured) (violations []common.Violation, err error) {
 	for i := 0; i < v.numberOfViolations; i++ {
 		resource := unstructured.Unstructured{}
 		resource.SetName(fmt.Sprintf("%d", i))

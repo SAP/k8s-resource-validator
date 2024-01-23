@@ -1,8 +1,6 @@
 package common
 
 import (
-	"context"
-
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
@@ -15,7 +13,7 @@ type Validator interface {
 		The return violations slice is non-nil if invalid resources were found
 		The return error is non-nil if another type of error was encountered
 	*/
-	Validate(ctx context.Context, resources []unstructured.Unstructured) (violations []Violation, err error)
+	Validate(resources []unstructured.Unstructured) (violations []Violation, err error)
 	GetName() string
 }
 
@@ -26,4 +24,4 @@ type Violation struct {
 	ValidatorName string
 }
 
-type AbortFunc func() bool
+type AbortFunc func() (bool, error)

@@ -67,7 +67,7 @@ var _ = Describe("Allowed Pods", func() {
 
 		It("pod is in allowlist", func() {
 			allowedPodsValidator := NewAllowedPodsValidator(ctx, configDirectory)
-			violationsArray, err := allowedPodsValidator.Validate(ctx, []unstructured.Unstructured{allowedPodUnstructuredResource})
+			violationsArray, err := allowedPodsValidator.Validate([]unstructured.Unstructured{allowedPodUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(0))
 
@@ -85,7 +85,7 @@ var _ = Describe("Allowed Pods", func() {
 
 			allowedPodUnstructuredResource.SetName("not-allowed")
 			allowedPodUnstructuredResource.SetOwnerReferences([]metav1.OwnerReference{owner1})
-			violationsArray, err := allowedPodsValidator.Validate(ctx, []unstructured.Unstructured{allowedPodUnstructuredResource})
+			violationsArray, err := allowedPodsValidator.Validate([]unstructured.Unstructured{allowedPodUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(0))
 
@@ -96,7 +96,7 @@ var _ = Describe("Allowed Pods", func() {
 		It("pod is NOT in allowlist", func() {
 			allowedPodsValidator := NewAllowedPodsValidator(ctx, configDirectory)
 			allowedPodUnstructuredResource.SetName("not-allowed")
-			violationsArray, err := allowedPodsValidator.Validate(ctx, []unstructured.Unstructured{allowedPodUnstructuredResource})
+			violationsArray, err := allowedPodsValidator.Validate([]unstructured.Unstructured{allowedPodUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(1))
 
@@ -114,7 +114,7 @@ var _ = Describe("Allowed Pods", func() {
 			allowedPodUnstructuredResource.SetName("not-allowed-but-exempt")
 			allowedPodUnstructuredResource.SetLabels(labels)
 
-			violationsArray, err := allowedPodsValidator.Validate(ctx, []unstructured.Unstructured{allowedPodUnstructuredResource})
+			violationsArray, err := allowedPodsValidator.Validate([]unstructured.Unstructured{allowedPodUnstructuredResource})
 			Expect(err).To(Succeed())
 			Expect(violationsArray).To(HaveLen(0))
 
@@ -126,7 +126,7 @@ var _ = Describe("Allowed Pods", func() {
 			appFs.Remove(filepath.Join(configDirectory, allowlistFile))
 			allowedPodsValidator := NewAllowedPodsValidator(ctx, configDirectory)
 			allowedPodUnstructuredResource.SetName("not-allowed")
-			violationsArray, err := allowedPodsValidator.Validate(ctx, []unstructured.Unstructured{allowedPodUnstructuredResource})
+			violationsArray, err := allowedPodsValidator.Validate([]unstructured.Unstructured{allowedPodUnstructuredResource})
 			Expect(err).To(HaveOccurred())
 			Expect(violationsArray).To(HaveLen(0))
 

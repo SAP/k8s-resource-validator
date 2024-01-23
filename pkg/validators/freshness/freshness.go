@@ -33,7 +33,7 @@ func (v *FreshnessValidator) GetName() string {
 /*
 *
  */
-func (v *FreshnessValidator) Validate(ctx context.Context, resources []unstructured.Unstructured) (violations []common.Violation, err error) {
+func (v *FreshnessValidator) Validate(resources []unstructured.Unstructured) (violations []common.Violation, err error) {
 	pods := common.GetPods(resources)
 
 	for _, p := range pods {
