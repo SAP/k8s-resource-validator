@@ -2,6 +2,7 @@ package readiness
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 
@@ -51,6 +52,8 @@ func (v *ReadinessValidator) Validate(resources []unstructured.Unstructured) (vi
 		return nil, err
 	}
 
+	var cumulativeErr error
+
 	for _, readinesslistItem := range readinesslist {
 		resource, found := getReadinesslistItemResource(resources, readinesslistItem)
 		if !found {
@@ -68,6 +71,7 @@ func (v *ReadinessValidator) Validate(resources []unstructured.Unstructured) (vi
 		if err != nil {
 			msg := fmt.Sprintf("could not determine readiness of resource Kind: %s Name: %s Namespace: %s",
 				resource.GetKind(), resource.GetName(), resource.GetNamespace())
+			cumulativeErr = errors.Join(cumulativeErr, err, errors.New(msg))
 			v.logger.Error(err, msg)
 			continue
 		}
@@ -81,7 +85,7 @@ func (v *ReadinessValidator) Validate(resources []unstructured.Unstructured) (vi
 		}
 	}
 
-	return
+	return violations, cumulativeErr
 }
 
 func (v *ReadinessValidator) readReadinesslist(dir string) ([]ReadinesslistItem, error) {

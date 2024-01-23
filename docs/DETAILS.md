@@ -76,7 +76,7 @@ Kubernetes Resource Validator uses the [`logr`](https://github.com/go-logr/logr)
 
 The actual logging implementation is set by users of this library. See the `logr` documentation for a partial [list of supported logging implementations](https://github.com/go-logr/logr#implementations-non-exhaustive).
 
-Note that the `logr` instance should be placed on the `ctx` parameter of the `validation.NewValidation()` function. For example:
+**Note** that the `logr` instance should be placed on the `ctx` parameter of the `validation.NewValidation()` function. For example:
 
 ```go
 logger := stdr.New(stdlog.New(os.Stderr, "", stdlog.LstdFlags))

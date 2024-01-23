@@ -3,7 +3,6 @@ package validation
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/SAP/k8s-resource-validator/pkg/common"
 	"github.com/go-logr/logr"
@@ -19,15 +18,15 @@ ctx is expected to contain the logger
 
 thresholdLevelForErrors specifies that violations of this level or below are considered errors; others are info
 */
-func LogViolations(ctx context.Context, violations []common.Violation, thresholdLevelForErrors int) {
+func LogViolations(ctx context.Context, violations []common.Violation, thresholdLevelForErrors int) error {
 	logger, err := logr.FromContext(ctx)
+	if err != nil {
+		return err
+	}
+
 	if len(violations) == 0 {
-		if err == nil {
-			logger.WithName(LOGGER_NAME).V(2).Info("all resources are valid")
-		} else {
-			fmt.Fprint(os.Stdout, "all resources are valid")
-		}
-		return
+		logger.WithName(LOGGER_NAME).V(2).Info("all resources are valid")
+		return nil
 	}
 
 	for _, violation := range violations {
@@ -42,17 +41,11 @@ func LogViolations(ctx context.Context, violations []common.Violation, threshold
 		)
 
 		if violation.Level <= thresholdLevelForErrors {
-			if err == nil {
-				logger.WithName(LOGGER_NAME).Error(nil, "error violations", resourceString, violationString)
-			} else {
-				fmt.Print("error violations", resourceString, violationString)
-			}
+			logger.WithName(LOGGER_NAME).Error(nil, "error violations", resourceString, violationString)
 		} else {
-			if err == nil {
-				logger.WithName(LOGGER_NAME).V(violation.Level).Info("info violations", resourceString, violationString)
-			} else {
-				fmt.Fprint(os.Stdout, resourceString, violationString)
-			}
+			logger.WithName(LOGGER_NAME).V(violation.Level).Info("info violations", resourceString, violationString)
 		}
 	}
+
+	return nil
 }

@@ -9,6 +9,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	stdlog "log"
 	"os"
 	"path/filepath"
@@ -88,7 +89,10 @@ func main() {
 	aggregatedViolations := getCustomViolations(violations)
 
 	// log the violations
-	validation.LogViolations(ctx, aggregatedViolations, 0)
+	err = validation.LogViolations(ctx, aggregatedViolations, 0)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 // perform custom post-validation manipulation, before sending violations to logger

@@ -115,7 +115,9 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		violations := []common.Violation{errorViolation, infoViolation}
 
 		logLengthBefore := len(logBuffer.String())
-		LogViolations(ctx, violations, 0)
+		err := LogViolations(ctx, violations, 0)
+		Expect(err).To(Succeed())
+
 		out := logBuffer.String()[logLengthBefore:]
 
 		Expect(out).To(ContainSubstring("info violations"))
@@ -130,7 +132,9 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		violations := []common.Violation{}
 
 		logLengthBefore := len(logBuffer.String())
-		LogViolations(ctx, violations, 1)
+		err := LogViolations(ctx, violations, 1)
+		Expect(err).To(Succeed())
+
 		out := logBuffer.String()[logLengthBefore:]
 		Expect(out).To(ContainSubstring("valid"))
 	})
