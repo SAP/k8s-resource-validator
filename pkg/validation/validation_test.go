@@ -94,10 +94,33 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		validation.SetClient(client)
 		Expect(err).To(Succeed())
 
-		fakeValidator := fake.NewFakeValidator(ctx, numberOfViolations)
-		violations, _ := validation.Validate([]common.Validator{fakeValidator})
+		fakeValidator, err := fake.NewFakeValidator(ctx, numberOfViolations, false)
+		Expect(err).To(Succeed())
+
+		violations, err := validation.Validate([]common.Validator{fakeValidator})
+		Expect(err).To(Succeed())
 
 		Expect(len(violations)).To(Equal(numberOfViolations))
+	})
+
+	It("validate should fail with error", func() {
+		client := &K8SProvider{
+			dynamic:   testclient.NewSimpleDynamicClient(scheme),
+			clientSet: k8sfake.NewSimpleClientset(),
+		}
+
+		numberOfViolations := 2
+		validation, err := NewValidation(ctx)
+		validation.SetClient(client)
+		Expect(err).To(Succeed())
+
+		fakeValidator, err := fake.NewFakeValidator(ctx, numberOfViolations, true)
+		Expect(err).To(Succeed())
+
+		violations, err := validation.Validate([]common.Validator{fakeValidator})
+		Expect(err).To(Not(Succeed()))
+
+		Expect(len(violations)).To(Equal(0))
 	})
 
 	It("write violations to log", func() {
@@ -240,7 +263,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		validation.SetClient(client)
 		Expect(err).To(Succeed())
 
-		grvs := validation.readAdditionalResourceTypes(configDirectory)
+		grvs, err := validation.readAdditionalResourceTypes(configDirectory)
+		Expect(err).To(Not(Succeed()))
 
 		Expect(grvs).To(BeNil())
 	})

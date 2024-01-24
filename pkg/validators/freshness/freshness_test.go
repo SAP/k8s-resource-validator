@@ -51,7 +51,9 @@ var _ = Describe("Freshness", func() {
 		})
 
 		It("pod is fresh", func() {
-			freshnessValidator := NewFreshnessValidator(ctx, 1) // any resource created less than 1 hour ago is fresh
+			freshnessValidator, err := NewFreshnessValidator(ctx, 1) // any resource created less than 1 hour ago is fresh
+			Expect(err).To(Succeed())
+
 			thirtyMinutesAgo := metav1.Now().Add(time.Minute * -30)
 			freshnessUnstructuredResource.SetCreationTimestamp(metav1.NewTime(thirtyMinutesAgo))
 
@@ -61,7 +63,8 @@ var _ = Describe("Freshness", func() {
 		})
 
 		It("pod is fresh (no creationTimestamp)", func() {
-			freshnessValidator := NewFreshnessValidator(ctx, 1) // any resource created less than 1 hour ago is fresh
+			freshnessValidator, err := NewFreshnessValidator(ctx, 1) // any resource created less than 1 hour ago is fresh
+			Expect(err).To(Succeed())
 
 			violationsArray, err := freshnessValidator.Validate([]unstructured.Unstructured{freshnessUnstructuredResource})
 			Expect(err).To(Succeed())
@@ -69,7 +72,9 @@ var _ = Describe("Freshness", func() {
 		})
 
 		It("pod is stale", func() {
-			freshnessValidator := NewFreshnessValidator(ctx, 1) // any resource created less than 1 hour ago is fresh
+			freshnessValidator, err := NewFreshnessValidator(ctx, 1) // any resource created less than 1 hour ago is fresh
+			Expect(err).To(Succeed())
+
 			thirtyMinutesAgo := metav1.Now().Add(time.Minute * -90)
 			freshnessUnstructuredResource.SetCreationTimestamp(metav1.NewTime(thirtyMinutesAgo))
 
@@ -84,7 +89,9 @@ var _ = Describe("Freshness", func() {
 			var labels map[string]string = make(map[string]string)
 			labels["label1"] = "exempt"
 
-			freshnessValidator := NewFreshnessValidator(ctx, 1) // any resource created less than 1 hour ago is fresh
+			freshnessValidator, err := NewFreshnessValidator(ctx, 1) // any resource created less than 1 hour ago is fresh
+			Expect(err).To(Succeed())
+
 			thirtyMinutesAgo := metav1.Now().Add(time.Minute * -90)
 			freshnessUnstructuredResource.SetCreationTimestamp(metav1.NewTime(thirtyMinutesAgo))
 			freshnessUnstructuredResource.SetName("stale-but-exempt")

@@ -25,10 +25,16 @@ const (
 	privilegedReasonTpl   = "securityContext %s value is %s\n"
 )
 
-func NewPrivilegedPodsValidator(ctx context.Context) common.Validator {
+func NewPrivilegedPodsValidator(ctx context.Context) (common.Validator, error) {
 	response := PrivilegedPodsValidator{ctx: ctx}
-	response.logger, _ = logr.FromContext(ctx)
-	return &response
+	
+	var err error
+	response.logger, err = logr.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
 }
 
 type PrivilegedPodsValidator struct {

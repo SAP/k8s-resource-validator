@@ -63,7 +63,8 @@ var _ = Describe("Readiness", func() {
 		})
 
 		It("pod is ready (conditions)", func() {
-			readinessValidator := NewReadinessValidator(ctx, configDirectory, false)
+			readinessValidator, err := NewReadinessValidator(ctx, configDirectory, false)
+			Expect(err).To(Succeed())
 
 			readyCondition := make(map[string]interface{})
 			readyCondition["type"] = "Ready"
@@ -77,7 +78,8 @@ var _ = Describe("Readiness", func() {
 		})
 
 		It("pod is ready (ready is true)", func() {
-			readinessValidator := NewReadinessValidator(ctx, configDirectory, false)
+			readinessValidator, err := NewReadinessValidator(ctx, configDirectory, false)
+			Expect(err).To(Succeed())
 
 			unstructured.SetNestedField(readinessUnstructuredResource.Object, true, "status", "ready")
 
@@ -87,7 +89,8 @@ var _ = Describe("Readiness", func() {
 		})
 
 		It("pod is not ready (conditions)", func() {
-			readinessValidator := NewReadinessValidator(ctx, configDirectory, false)
+			readinessValidator, err := NewReadinessValidator(ctx, configDirectory, false)
+			Expect(err).To(Succeed())
 
 			readyCondition := make(map[string]interface{})
 			readyCondition["type"] = "Ready"
@@ -101,7 +104,8 @@ var _ = Describe("Readiness", func() {
 		})
 
 		It("pod is not ready (missing status)", func() {
-			freshnessValidator := NewReadinessValidator(ctx, configDirectory, false)
+			freshnessValidator, err := NewReadinessValidator(ctx, configDirectory, false)
+			Expect(err).To(Succeed())
 
 			violationsArray, err := freshnessValidator.Validate([]unstructured.Unstructured{readinessUnstructuredResource})
 			Expect(err).To(Succeed())
@@ -109,7 +113,8 @@ var _ = Describe("Readiness", func() {
 		})
 
 		It("could not read readiness file", func() {
-			freshnessValidator := NewReadinessValidator(ctx, "/doesnotexist/", false)
+			freshnessValidator, err := NewReadinessValidator(ctx, "/doesnotexist/", false)
+			Expect(err).To(Succeed())
 
 			violationsArray, err := freshnessValidator.Validate([]unstructured.Unstructured{readinessUnstructuredResource})
 			Expect(err).To(HaveOccurred())
@@ -117,7 +122,8 @@ var _ = Describe("Readiness", func() {
 		})
 
 		It("could not parse readiness file", func() {
-			freshnessValidator := NewReadinessValidator(ctx, configDirectory, false)
+			freshnessValidator, err := NewReadinessValidator(ctx, configDirectory, false)
+			Expect(err).To(Succeed())
 
 			readinessListItemsAsString := "-- "
 			_ = afero.WriteFile(appFs, filepath.Join(configDirectory, readinesslistFile), []byte(readinessListItemsAsString), 0644)
@@ -128,7 +134,8 @@ var _ = Describe("Readiness", func() {
 		})
 
 		It("resource in readiness list not found", func() {
-			readinessValidator := NewReadinessValidator(ctx, configDirectory, false)
+			readinessValidator, err := NewReadinessValidator(ctx, configDirectory, false)
+			Expect(err).To(Succeed())
 
 			readinessListItemsAsString := fmt.Sprintf("- name: %s\n  namespace: %s\n  kind: %s\n",
 				"doesnotexist", namespace, common.KIND_POD,
@@ -141,7 +148,8 @@ var _ = Describe("Readiness", func() {
 		})
 
 		It("resource in readiness list not found, but ignoring", func() {
-			readinessValidator := NewReadinessValidator(ctx, configDirectory, true)
+			readinessValidator, err := NewReadinessValidator(ctx, configDirectory, true)
+			Expect(err).To(Succeed())
 
 			readinessListItemsAsString := fmt.Sprintf("- name: %s\n  namespace: %s\n  kind: %s\n",
 				"doesnotexist", namespace, common.KIND_POD,

@@ -14,10 +14,16 @@ import (
 
 const ValidatorName = "built-in:freshness"
 
-func NewFreshnessValidator(ctx context.Context, freshnessThresholdInHours int32) common.Validator {
+func NewFreshnessValidator(ctx context.Context, freshnessThresholdInHours int32) (common.Validator, error) {
 	response := FreshnessValidator{freshnessThresholdInHours: freshnessThresholdInHours, ctx: ctx}
-	response.logger, _ = logr.FromContext(ctx)
-	return &response
+
+	var err error
+	response.logger, err = logr.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
 }
 
 type FreshnessValidator struct {

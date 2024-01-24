@@ -4,11 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 
 	"github.com/SAP/k8s-resource-validator/pkg/common"
+	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/go-logr/logr"
@@ -69,7 +72,7 @@ func (v *Validation) SetAbortFunc(abortFunc common.AbortFunc) {
 	v.abortFunc = abortFunc
 }
 
-func (v *Validation) preValidate() (aborted bool, err error) {
+func (v *Validation) preValidate() (bool, error) {
 	if !v.preValidated {
 		if v.Client == nil {
 			var err error
@@ -82,12 +85,20 @@ func (v *Validation) preValidate() (aborted bool, err error) {
 
 		configDir := resolveConfigDirectory()
 
-		additionalResourceTypes := v.readAdditionalResourceTypes(configDir)
+		additionalResourceTypes, err := v.readAdditionalResourceTypes(configDir)
+		if err != nil {
+			return false, err
+		}
 
 		v.Resources = fetchResources(v.ctx, *v.Client, additionalResourceTypes)
 
 		if v.abortFunc == nil {
-			shouldAbort, abortMessage := v.shouldAbortValidation(v.ctx, *v.Client)
+			shouldAbort, abortMessage, err := v.shouldAbortValidation(v.ctx, *v.Client)
+			if err != nil {
+				v.logger.Error(err, "error determining whether should abort the validation")
+				return true, err
+			}
+
 			v.logger.V(2).Info(abortMessage)
 			if shouldAbort {
 				return true, nil
@@ -134,24 +145,29 @@ func (v *Validation) Validate(validators []common.Validator) ([]common.Violation
 	return violations, cumulativeErr
 }
 
-func (v *Validation) readAdditionalResourceTypes(dir string) []schema.GroupVersionResource {
+func (v *Validation) readAdditionalResourceTypes(dir string) ([]schema.GroupVersionResource, error) {
 	var additionalResourceTypes []schema.GroupVersionResource
 
 	additionalResourceTypesFullPath := filepath.Join(dir, additionalResourceTypesFile)
 
 	content, err := afero.ReadFile(v.appFs, additionalResourceTypesFullPath)
 	if err != nil {
-		v.logger.V(0).Info("couldn't find additional resource types file", additionalResourceTypesFullPath)
-		return nil
+		if errors.Is(err, fs.ErrNotExist) {
+			v.logger.V(0).Info("couldn't find additional resource types file", additionalResourceTypesFullPath)
+			return nil, nil
+		} else {
+			v.logger.Error(err, "couldn't read additional resource types file")
+			return nil, err
+		}
 	} else {
 		err := yaml.Unmarshal(content, &additionalResourceTypes)
 		if err != nil {
 			v.logger.Error(err, "couldn't parse additional resource types file")
-			return nil
+			return nil, err
 		}
 	}
 
-	return additionalResourceTypes
+	return additionalResourceTypes, nil
 }
 
 func resolveConfigDirectory() string {
@@ -163,27 +179,39 @@ func resolveConfigDirectory() string {
 	return result
 }
 
-// returns true if validation should be aborted. E.g. resources are currently being deployed.
-func (v *Validation) shouldAbortValidation(ctx context.Context, client K8SProvider) (bool, string) {
+/*
+	returns true if validation should be aborted. E.g. resources are currently being deployed.
+
+return values:
+
+	shouldAbort bool - true if should abort
+	reason string    - reason for abortion
+	err error        - in case an error occurred
+*/
+func (v *Validation) shouldAbortValidation(ctx context.Context, client K8SProvider) (bool, string, error) {
 	configMap, err := client.clientSet.CoreV1().ConfigMaps(v.AbortValidationConfigMapNamespace).Get(ctx, v.AbortValidationConfigMapName, metav1.GetOptions{})
 	if err != nil {
 		// if configMap not present, we perform validation anyway
-		return false, fmt.Sprintf("Abort configMap %s not found: Resuming validation", v.AbortValidationConfigMapName)
+		if k8sErrors.IsNotFound(err) {
+			return false, fmt.Sprintf("Abort configMap %s not found: Resuming validation", v.AbortValidationConfigMapName), nil
+		} else {
+			return false, "", err
+		}
 	}
 
 	shouldAbort, ok := configMap.Data[v.AbortValidationConfigMapField]
 	if !ok {
 		// if field not present, we perform validation anyway
-		return false, fmt.Sprintf("Field %s not found in abort configMap: Resuming validation", v.AbortValidationConfigMapField)
+		return false, fmt.Sprintf("Field %s not found in abort configMap: Resuming validation", v.AbortValidationConfigMapField), nil
 	}
 
 	if string(shouldAbort) == "true" {
 		message := fmt.Sprintf("Abort configMap %s set to \"true\": Aborting validation", v.AbortValidationConfigMapName)
-		return true, message
+		return true, message, nil
 	}
 
 	message := fmt.Sprintf("Abort configMap %s found, but field %s is NOT set to \"true\": Resuming validation", v.AbortValidationConfigMapName, v.AbortValidationConfigMapField)
-	return false, message
+	return false, message, nil
 }
 
 func (v *Validation) loadConfiguration() {

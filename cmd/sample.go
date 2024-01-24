@@ -63,16 +63,25 @@ func main() {
 	}
 
 	// instantiate relevant validators
-	readinessValidator := readiness.NewReadinessValidator(ctx, configDirectory, false)
-	freshnessValidator := freshness.NewFreshnessValidator(ctx, freshnessThresholdInHours)
-	allowedPodsValidator := allowed_pods.NewAllowedPodsValidator(ctx, configDirectory)
-	privilegedPodsValidator := privileged_pods.NewPrivilegedPodsValidator(ctx)
+	var validatorList []common.Validator
+	readinessValidator, err := readiness.NewReadinessValidator(ctx, configDirectory, false)
+	if err == nil {
+		validatorList = append(validatorList, readinessValidator)
+	}
 
-	validatorList := []common.Validator{
-		allowedPodsValidator,
-		readinessValidator,
-		freshnessValidator,
-		privilegedPodsValidator,
+	freshnessValidator, err := freshness.NewFreshnessValidator(ctx, freshnessThresholdInHours)
+	if err == nil {
+		validatorList = append(validatorList, freshnessValidator)
+	}
+
+	allowedPodsValidator, err := allowed_pods.NewAllowedPodsValidator(ctx, configDirectory)
+	if err == nil {
+		validatorList = append(validatorList, allowedPodsValidator)
+	}
+
+	privilegedPodsValidator, err := privileged_pods.NewPrivilegedPodsValidator(ctx)
+	if err == nil {
+		validatorList = append(validatorList, privilegedPodsValidator)
 	}
 
 	// optionally, set an abort function

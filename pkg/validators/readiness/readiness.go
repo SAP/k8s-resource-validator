@@ -25,11 +25,17 @@ type ReadinesslistItem struct {
 	Kind      string `yaml:"kind"`
 }
 
-func NewReadinessValidator(ctx context.Context, configDir string, ignoreMissingResources bool) common.Validator {
+func NewReadinessValidator(ctx context.Context, configDir string, ignoreMissingResources bool) (common.Validator, error) {
 	response := ReadinessValidator{configDir: configDir, ctx: ctx, ignoreMissingResources: ignoreMissingResources}
-	response.logger, _ = logr.FromContext(ctx)
+
+	var err error
+	response.logger, err = logr.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	response.appFs = ctx.Value(common.FileSystemContextKey).(afero.Fs)
-	return &response
+	return &response, nil
 }
 
 type ReadinessValidator struct {
@@ -45,9 +51,10 @@ func (v *ReadinessValidator) GetName() string {
 }
 
 // validates all the resources from readinesslist are ready
-func (v *ReadinessValidator) Validate(resources []unstructured.Unstructured) (violations []common.Violation, err error) {
+func (v *ReadinessValidator) Validate(resources []unstructured.Unstructured) ([]common.Violation, error) {
+	var violations []common.Violation
 	var readinesslist []ReadinesslistItem
-	readinesslist, err = v.readReadinesslist(v.configDir)
+	readinesslist, err := v.readReadinesslist(v.configDir)
 	if err != nil {
 		return nil, err
 	}

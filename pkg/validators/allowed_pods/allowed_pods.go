@@ -23,15 +23,21 @@ type AllowlistItem struct {
 	Kind      string `yaml:"kind"`
 }
 
-func NewAllowedPodsValidator(ctx context.Context, configDir string) common.Validator {
+func NewAllowedPodsValidator(ctx context.Context, configDir string) (common.Validator, error) {
 	response := AllowedPodsValidator{
 		configDir:   configDir,
 		allowedPods: []unstructured.Unstructured{},
 		ctx:         ctx,
 	}
-	response.logger, _ = logr.FromContext(ctx)
+
+	var err error
+	response.logger, err = logr.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	response.appFs = ctx.Value(common.FileSystemContextKey).(afero.Fs)
-	return &response
+	return &response, nil
 }
 
 type AllowedPodsValidator struct {
