@@ -87,7 +87,7 @@ func fetchResourcesOfKind(ctx context.Context, client K8SProvider, gvr schema.Gr
 	logger, _ := logr.FromContext(ctx)
 	resources, err := client.dynamic.Resource(gvr).List(ctx, metav1.ListOptions{})
 	if err != nil {
-		logger.V(0).Info("list failure", "resource", gvr.Resource, "error", err)
+		logger.Error(err, "failed to list resource", gvr.Resource)
 		return nil
 	} else {
 		logger.V(2).Info(fmt.Sprintf("there are %d %s in the cluster", len(resources.Items), gvr.Resource))

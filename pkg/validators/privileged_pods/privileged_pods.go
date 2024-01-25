@@ -20,14 +20,21 @@ var (
 )
 
 const (
+	ValidatorName         = "built-in:privileged-pods"
 	capabilityCapSysAdmin = "CAP_SYS_ADMIN"
 	privilegedReasonTpl   = "securityContext %s value is %s\n"
 )
 
-func NewPrivilegedPodsValidator(ctx context.Context) common.Validator {
+func NewPrivilegedPodsValidator(ctx context.Context) (common.Validator, error) {
 	response := PrivilegedPodsValidator{ctx: ctx}
-	response.logger, _ = logr.FromContext(ctx)
-	return &response
+	
+	var err error
+	response.logger, err = logr.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
 }
 
 type PrivilegedPodsValidator struct {
@@ -36,13 +43,17 @@ type PrivilegedPodsValidator struct {
 	logger          logr.Logger
 }
 
+func (v *PrivilegedPodsValidator) GetName() string {
+	return ValidatorName
+}
+
 /*
 *
 
 	the return violations array is non-nil if invalid resources were found
 	the return error is non-nil if another type of error was encountered
 */
-func (v *PrivilegedPodsValidator) Validate(ctx context.Context, resources []unstructured.Unstructured) ([]common.Violation, error) {
+func (v *PrivilegedPodsValidator) Validate(resources []unstructured.Unstructured) ([]common.Violation, error) {
 	pods := common.GetPods(resources)
 	var violations []common.Violation
 	for _, pod := range pods {
@@ -69,10 +80,6 @@ func (v *PrivilegedPodsValidator) Validate(ctx context.Context, resources []unst
 	return violations, nil
 }
 
-func (v *PrivilegedPodsValidator) GetName() string {
-	return "built-in:privileged-pods"
-}
-
 func (v *PrivilegedPodsValidator) SetPreApprovedPods(pods []unstructured.Unstructured) {
 	v.preApprovedPods = pods
 }
@@ -84,7 +91,7 @@ func (v *PrivilegedPodsValidator) handlePrivilegedPod(p unstructured.Unstructure
 	}
 
 	if privilegedPodMsg != "" {
-		violation := common.NewViolation(p, "found privileged pod", 1, v.GetName())
+		violation := common.NewViolation(p, "found privileged pod", 1, ValidatorName)
 		violations = append(violations, violation)
 	}
 	return violations, nil

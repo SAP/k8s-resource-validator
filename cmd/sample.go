@@ -9,6 +9,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	stdlog "log"
 	"os"
 	"path/filepath"
@@ -33,13 +34,9 @@ func main() {
 	// initialize context with logger and file system
 	ctx := context.Background()
 	stdr.SetVerbosity(2)
-	// 0 verbosity indicates a k8s-resource-validator error (e.g. unable to load config file)
-	// 1 verbosity indicates info-level violations
-	// 2 verbosity indicates a k8s-resource-validator info
-	// k8s-resource-validator violations are written to log as errors
 	logger := stdr.New(stdlog.New(os.Stderr, "", stdlog.LstdFlags))
-
 	ctx = logr.NewContext(ctx, logger)
+
 	appFs := afero.NewOsFs()
 	ctx = context.WithValue(ctx, common.FileSystemContextKey, appFs)
 
@@ -66,31 +63,45 @@ func main() {
 	}
 
 	// instantiate relevant validators
-	readinessValidator := readiness.NewReadinessValidator(ctx, configDirectory, false)
-	freshnessValidator := freshness.NewFreshnessValidator(ctx, freshnessThresholdInHours)
-	allowedPodsValidator := allowed_pods.NewAllowedPodsValidator(ctx, configDirectory)
-	privilegedPodsValidator := privileged_pods.NewPrivilegedPodsValidator(ctx)
-
-	validatorList := []common.Validator{
-		allowedPodsValidator,
-		readinessValidator,
-		freshnessValidator,
-		privilegedPodsValidator,
+	var validatorList []common.Validator
+	readinessValidator, err := readiness.NewReadinessValidator(ctx, configDirectory, false)
+	if err == nil {
+		validatorList = append(validatorList, readinessValidator)
 	}
 
-	// optionally set an abort function
+	freshnessValidator, err := freshness.NewFreshnessValidator(ctx, freshnessThresholdInHours)
+	if err == nil {
+		validatorList = append(validatorList, freshnessValidator)
+	}
+
+	allowedPodsValidator, err := allowed_pods.NewAllowedPodsValidator(ctx, configDirectory)
+	if err == nil {
+		validatorList = append(validatorList, allowedPodsValidator)
+	}
+
+	privilegedPodsValidator, err := privileged_pods.NewPrivilegedPodsValidator(ctx)
+	if err == nil {
+		validatorList = append(validatorList, privilegedPodsValidator)
+	}
+
+	// optionally, set an abort function
 	// validationInstance.SetAbortFunc(func() bool {
 	// 	return len(validationInstance.Resources) == 0 // place your custom abort logic here
 	// })
 
 	// perform the validation
-	violations := validationInstance.Validate(validatorList)
+	violations, _ := validationInstance.Validate(validatorList)
+
+	// optionally, process (non-violation) errors
 
 	// aggregate violations
 	aggregatedViolations := getCustomViolations(violations)
 
-	// log violations
-	validation.Log(ctx, aggregatedViolations, 0)
+	// log the violations
+	err = validation.LogViolations(ctx, aggregatedViolations, 0)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 // perform custom post-validation manipulation, before sending violations to logger

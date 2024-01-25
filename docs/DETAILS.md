@@ -72,9 +72,17 @@ abort:
 Set the value of the `configMapField` to `"true"` to abort the validation. In all other cases (e.g. the `ConfigMap` is not found) the validation will execute normally.
 
 ## Logging
-Kubernetes Resource Validator uses the [`logr`](https://github.com/go-logr/logr) library as an interface to logging violations as well as other errors.
+Kubernetes Resource Validator uses the [`logr`](https://github.com/go-logr/logr) library as its logging interface.
 
 The actual logging implementation is set by users of this library. See the `logr` documentation for a partial [list of supported logging implementations](https://github.com/go-logr/logr#implementations-non-exhaustive).
+
+**Note** that the `logr` instance should be placed on the `ctx` parameter of the `validation.NewValidation()` function. For example:
+
+```go
+logger := stdr.New(stdlog.New(os.Stderr, "", stdlog.LstdFlags))
+ctx = logr.NewContext(ctx, logger)
+validationInstance, err := validation.NewValidation(ctx)
+```
 
 ## Configuration
 By default, the configuration directory is located in `/config/`. You can change this by setting the `CONFIG_DIR` environment variable.
