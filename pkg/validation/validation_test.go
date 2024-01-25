@@ -269,6 +269,22 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		Expect(grvs).To(BeNil())
 	})
 
+	It("additional resource types file doesn't exist", func() {
+		client := &K8SProvider{
+			dynamic:   testclient.NewSimpleDynamicClient(scheme),
+			clientSet: k8sfake.NewSimpleClientset(),
+		}
+
+		validation, err := NewValidation(ctx)
+		validation.SetClient(client)
+		Expect(err).To(Succeed())
+
+		grvs, err := validation.readAdditionalResourceTypes(configDirectory)
+		Expect(err).To(Succeed())
+
+		Expect(grvs).To(BeNil())
+	})
+
 	It("load configuration", func() {
 		a := "abort-ns1"
 		b := "abort-n1"

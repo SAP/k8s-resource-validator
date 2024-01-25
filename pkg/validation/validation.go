@@ -127,7 +127,7 @@ func (v *Validation) Validate(validators []common.Validator) ([]common.Violation
 	}
 
 	if aborted {
-		return violations, cumulativeErr
+		return violations, nil
 	}
 
 	for _, validator := range validators {
@@ -155,10 +155,9 @@ func (v *Validation) readAdditionalResourceTypes(dir string) ([]schema.GroupVers
 		if errors.Is(err, fs.ErrNotExist) {
 			v.logger.V(0).Info("couldn't find additional resource types file", additionalResourceTypesFullPath)
 			return nil, nil
-		} else {
-			v.logger.Error(err, "couldn't read additional resource types file")
-			return nil, err
 		}
+		v.logger.Error(err, "couldn't read additional resource types file")
+		return nil, err
 	} else {
 		err := yaml.Unmarshal(content, &additionalResourceTypes)
 		if err != nil {
@@ -194,9 +193,8 @@ func (v *Validation) shouldAbortValidation(ctx context.Context, client K8SProvid
 		// if configMap not present, we perform validation anyway
 		if k8sErrors.IsNotFound(err) {
 			return false, fmt.Sprintf("Abort configMap %s not found: Resuming validation", v.AbortValidationConfigMapName), nil
-		} else {
-			return false, "", err
 		}
+		return false, "", err
 	}
 
 	shouldAbort, ok := configMap.Data[v.AbortValidationConfigMapField]
