@@ -41,7 +41,7 @@ type Validation struct {
 	ctx                               context.Context
 	appFs                             afero.Fs
 	logger                            logr.Logger
-	preValidated                      bool
+	PreValidated                      bool
 }
 
 func NewValidation(ctx context.Context) (*Validation, error) {
@@ -51,7 +51,7 @@ func NewValidation(ctx context.Context) (*Validation, error) {
 
 	response.loadConfiguration()
 
-	response.preValidated = false
+	response.PreValidated = false
 
 	// set default values
 	response.AbortValidationConfigMapField = "deploying"
@@ -64,6 +64,16 @@ func NewValidation(ctx context.Context) (*Validation, error) {
 /*
 If this function is not called, a new client will be created in preValidate()
 */
+func (v *Validation) SetContext(context context.Context) {
+	v.ctx = context
+}
+func (v *Validation) SetAppFileSystem(appFs afero.Fs) {
+	v.appFs = appFs
+}
+func (v *Validation) SetLogger(logger logr.Logger) {
+	v.logger = logger
+}
+
 func (v *Validation) SetClient(client *K8SProvider) {
 	v.Client = client
 }
@@ -73,7 +83,7 @@ func (v *Validation) SetAbortFunc(abortFunc common.AbortFunc) {
 }
 
 func (v *Validation) preValidate() (bool, error) {
-	if !v.preValidated {
+	if !v.PreValidated {
 		if v.Client == nil {
 			var err error
 			v.Client, err = getClient()
@@ -107,7 +117,7 @@ func (v *Validation) preValidate() (bool, error) {
 			return v.abortFunc()
 		}
 
-		v.preValidated = true
+		v.PreValidated = true
 	}
 
 	return false, nil
