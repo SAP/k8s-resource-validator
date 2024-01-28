@@ -188,7 +188,7 @@ return values:
 	err error        - in case an error occurred
 */
 func (v *Validation) shouldAbortValidation(ctx context.Context, client K8SProvider) (bool, string, error) {
-	configMap, err := client.clientSet.CoreV1().ConfigMaps(v.AbortValidationConfigMapNamespace).Get(ctx, v.AbortValidationConfigMapName, metav1.GetOptions{})
+	configMap, err := client.ClientSet.CoreV1().ConfigMaps(v.AbortValidationConfigMapNamespace).Get(ctx, v.AbortValidationConfigMapName, metav1.GetOptions{})
 	if err != nil {
 		// if configMap not present, we perform validation anyway
 		if k8sErrors.IsNotFound(err) {

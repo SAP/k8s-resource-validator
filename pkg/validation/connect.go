@@ -27,8 +27,8 @@ func init() {
 }
 
 type K8SProvider struct {
-	dynamic   dynamic.Interface
-	clientSet kubernetes.Interface
+	Dynamic   dynamic.Interface
+	ClientSet kubernetes.Interface
 }
 
 func getClient() (*K8SProvider, error) {
@@ -69,12 +69,12 @@ func getClient() (*K8SProvider, error) {
 			}
 		}
 
-		provider.dynamic, err = dynamic.NewForConfig(config)
+		provider.Dynamic, err = dynamic.NewForConfig(config)
 		if err != nil {
 			return nil, err
 		}
 
-		provider.clientSet, err = kubernetes.NewForConfig(config)
+		provider.ClientSet, err = kubernetes.NewForConfig(config)
 		if err != nil {
 			return nil, err
 		}
@@ -85,7 +85,7 @@ func getClient() (*K8SProvider, error) {
 
 func fetchResourcesOfKind(ctx context.Context, client K8SProvider, gvr schema.GroupVersionResource) []unstructured.Unstructured {
 	logger, _ := logr.FromContext(ctx)
-	resources, err := client.dynamic.Resource(gvr).List(ctx, metav1.ListOptions{})
+	resources, err := client.Dynamic.Resource(gvr).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		logger.Error(err, "failed to list resource", gvr.Resource)
 		return nil

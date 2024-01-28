@@ -69,8 +69,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		pod1.SetNamespace(namespace1)
 
 		client := &K8SProvider{
-			dynamic:   testclient.NewSimpleDynamicClient(scheme, pod1),
-			clientSet: k8sfake.NewSimpleClientset(pod1),
+			Dynamic:   testclient.NewSimpleDynamicClient(scheme, pod1),
+			ClientSet: k8sfake.NewSimpleClientset(pod1),
 		}
 
 		validation, err := NewValidation(ctx)
@@ -85,8 +85,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 
 	It("validate with fake validator", func() {
 		client := &K8SProvider{
-			dynamic:   testclient.NewSimpleDynamicClient(scheme),
-			clientSet: k8sfake.NewSimpleClientset(),
+			Dynamic:   testclient.NewSimpleDynamicClient(scheme),
+			ClientSet: k8sfake.NewSimpleClientset(),
 		}
 
 		numberOfViolations := 2
@@ -105,8 +105,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 
 	It("validate should fail with error", func() {
 		client := &K8SProvider{
-			dynamic:   testclient.NewSimpleDynamicClient(scheme),
-			clientSet: k8sfake.NewSimpleClientset(),
+			Dynamic:   testclient.NewSimpleDynamicClient(scheme),
+			ClientSet: k8sfake.NewSimpleClientset(),
 		}
 
 		numberOfViolations := 2
@@ -175,8 +175,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		abortConfigMap.Data = data
 
 		client := &K8SProvider{
-			dynamic:   testclient.NewSimpleDynamicClient(scheme, abortConfigMap),
-			clientSet: k8sfake.NewSimpleClientset(abortConfigMap),
+			Dynamic:   testclient.NewSimpleDynamicClient(scheme, abortConfigMap),
+			ClientSet: k8sfake.NewSimpleClientset(abortConfigMap),
 		}
 
 		validation, err := NewValidation(ctx)
@@ -204,8 +204,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		abortConfigMap.Data = data
 
 		client := &K8SProvider{
-			dynamic:   testclient.NewSimpleDynamicClient(scheme, abortConfigMap),
-			clientSet: k8sfake.NewSimpleClientset(abortConfigMap),
+			Dynamic:   testclient.NewSimpleDynamicClient(scheme, abortConfigMap),
+			ClientSet: k8sfake.NewSimpleClientset(abortConfigMap),
 		}
 
 		validation, err := NewValidation(ctx)
@@ -233,8 +233,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		abortConfigMap.Data = data
 
 		client := &K8SProvider{
-			dynamic:   testclient.NewSimpleDynamicClient(scheme, abortConfigMap),
-			clientSet: k8sfake.NewSimpleClientset(abortConfigMap),
+			Dynamic:   testclient.NewSimpleDynamicClient(scheme, abortConfigMap),
+			ClientSet: k8sfake.NewSimpleClientset(abortConfigMap),
 		}
 
 		validation, err := NewValidation(ctx)
@@ -255,8 +255,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		_ = afero.WriteFile(appFs, filepath.Join(configDirectory, additionalResourceTypesFile), []byte(additionalResourceTyepeAsString), 0644)
 
 		client := &K8SProvider{
-			dynamic:   testclient.NewSimpleDynamicClient(scheme),
-			clientSet: k8sfake.NewSimpleClientset(),
+			Dynamic:   testclient.NewSimpleDynamicClient(scheme),
+			ClientSet: k8sfake.NewSimpleClientset(),
 		}
 
 		validation, err := NewValidation(ctx)
@@ -271,8 +271,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 
 	It("additional resource types file doesn't exist", func() {
 		client := &K8SProvider{
-			dynamic:   testclient.NewSimpleDynamicClient(scheme),
-			clientSet: k8sfake.NewSimpleClientset(),
+			Dynamic:   testclient.NewSimpleDynamicClient(scheme),
+			ClientSet: k8sfake.NewSimpleClientset(),
 		}
 
 		validation, err := NewValidation(ctx)
@@ -297,8 +297,8 @@ var _ = Describe("k8s-resource-validator tests", func() {
 		_ = afero.WriteFile(appFs, filepath.Join(configDirectory, configFileName), []byte(configAsString), 0644)
 
 		client := &K8SProvider{
-			dynamic:   testclient.NewSimpleDynamicClient(scheme),
-			clientSet: k8sfake.NewSimpleClientset(),
+			Dynamic:   testclient.NewSimpleDynamicClient(scheme),
+			ClientSet: k8sfake.NewSimpleClientset(),
 		}
 
 		validation, err := NewValidation(ctx)
