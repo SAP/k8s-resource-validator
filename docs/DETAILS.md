@@ -19,16 +19,16 @@ The alternatives we evaluated allow defining custom policies declaratively. Howe
 This repo contains implementations for several built-in validators:
 
 ### Allowed Pods
-The [allowed pods validator](./pkg/validators/allowed_pods/) ensures that all running `Pod`s match at least one of the following conditions:
+The [allowed pods validator](../pkg/validators/allowed_pods/) ensures that all running `Pod`s match at least one of the following conditions:
 * The `Pod` exists in a predefined configurable `allowlist`
 * Any of the `Pod`'s direct owners (see [`ownerReferences`](https://kubernetes.io/docs/concepts/overview/working-with-objects/owners-dependents/)) is in the `allowlist`
 * Any of the `Pod`'s owners' owners (recursively) is in the `allowlist`
-* The `Pod` is exempt from validation (see the [Exemptions](#exemptions) section)
+* The `Pod` is exempt from validation (see the [Exemptions](#exempt-resources) section)
 
 Read more about the [`allowlist`](#allowlist-format) format.
 
 ### Readiness
-The [readiness validator](./pkg/validators/readiness/) verifies that resources listed in a predefined `readinesslist` are ready.
+The [readiness validator](../pkg/validators/readiness/) verifies that resources listed in a predefined `readinesslist` are ready.
 
 A resource is "ready" if its:
 * `status.conditions` field has an entry with `type: Ready` and `status: "True"` fields
@@ -41,13 +41,17 @@ Note that this validator does *not* directly probe for [pod readiness](https://k
 Read more about the [`readinesslist`](#readinesslist-format) format.
 
 ### Freshness
-The [freshness validator](./pkg/validators/freshness/) issues violations if the age of any resource is above a certain value (time elapsed since `creationTimestamp`). The age is configurable.
+The [freshness validator](../pkg/validators/freshness/) issues violations if the age of any resource is above a certain value (time elapsed since `creationTimestamp`). The age is [configurable](#configuration):
+```yaml
+freshness:
+  thresholdInHours: 672
+```
 
 ### Privileged Pods
-The [privileged pods validator](./pkg/validators/privileged_pods/) issues violations if any pods are running as privileged pods.
+The [privileged pods validator](../pkg/validators/privileged_pods/) issues violations if any pods are running as privileged pods.
 
 ## Custom Validators
-You can create your own validation logic by implementing the [`Validator`](./pkg/common/types.go) interface.
+You can create your own validation logic by implementing the [`Validator`](../pkg/common/types.go) interface.
 
 ## Exempt Resources
 Certain resources can be exempt from validation. This is done by placing a specific `label` with a specific value on that resource.
@@ -161,8 +165,8 @@ View test coverage locally:
 go tool cover -html=cover.out
 ```
 
-### Addendum
-## Allowlist format
+## Addendum
+### Allowlist format
 The `allowlist.yaml` file looks like this:
 ```yaml
 - name: validator
@@ -173,7 +177,7 @@ The `allowlist.yaml` file looks like this:
   kind: Deployment
 ```
 
-## Readinesslist format
+### Readinesslist format
 The `readinesslist.yaml` file looks like this:
 ```yaml
 - name: a-must-be-ready-namespaced-resource-name
